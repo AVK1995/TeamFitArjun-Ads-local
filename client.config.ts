@@ -24,7 +24,13 @@ export const clientConfig = {
     name: "TeamFitArjun",
     legalName: "TeamFitArjun",
     coach: "Arjun",
-    domain: "teamfitarjun.com",
+    /**
+     * Ads-funnel clone — served from vsl.teamfitarjun.com. Drives the
+     * production-host gate in lib/tracking-gate.ts, the Meta Pixel init
+     * host check in app/layout.tsx, metadataBase, and the default
+     * event_source_url used by CAPI + the webhook.
+     */
+    domain: "vsl.teamfitarjun.com",
     productName: "Custom Execution Blueprint Call",
     shortProductName: "Blueprint Call",
     supportEmail: "support@teamfitarjun.com",
@@ -51,7 +57,16 @@ export const clientConfig = {
   },
 
   funnel: {
-    slug: "arjun-blueprint",
+    /**
+     * Ads-funnel slug — MUST differ from the organic funnel's
+     * "arjun-blueprint". Razorpay webhook subscriptions are account-level:
+     * both funnels' webhooks receive payment.captured for every payment
+     * on the account. create-order stamps this on notes.funnel and the
+     * webhook rejects anything with a different slug (see
+     * app/api/razorpay/webhook/route.ts), which is what prevents
+     * double-firing Pabbly + Meta CAPI on every payment.
+     */
+    slug: "arjun-blueprint-ads",
     /** sessionStorage key the UTM persistence reads/writes */
     sessionStorageKey: "arjun_utm",
     /** sessionStorage key the customer payload is held under between checkout → thank-you */
