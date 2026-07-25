@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 export const metadata = buildMetadata("thankYou");
 
 /** Vimeo id for the thank-you video — keep in step with HERO_VIDEO_URL in ThankYouView. */
-const HERO_VIDEO_ID = "1210109832";
+const HERO_VIDEO_ID = "1212886807";
 /** Used only if Vimeo is unreachable at build time. */
 const POSTER_FALLBACK = "/Thank%20you%20page%20video%20thumbnail.png";
 

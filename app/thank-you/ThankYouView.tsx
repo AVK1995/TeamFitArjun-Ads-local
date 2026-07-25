@@ -16,7 +16,7 @@ import { QUIZ_QUESTIONS } from "./quizQuestions";
 // Vimeo player embed (NOT a self-hosted mp4) — plays are only recorded in Vimeo
 // Analytics when the video is served by Vimeo's own player.
 // Do NOT add `dnt=1` to the query string: it turns Vimeo's tracking off.
-const HERO_VIDEO_URL = "https://player.vimeo.com/video/1210109832";
+const HERO_VIDEO_URL = "https://player.vimeo.com/video/1212886807";
 const HERO_THUMB_URL = "/Thank%20you%20page%20video%20thumbnail.png";
 const INSTAGRAM_URL = "https://www.instagram.com/thefitarjun/";
 

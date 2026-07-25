@@ -9,7 +9,7 @@ export const dynamic = "force-static";
 export const metadata = buildMetadata("home");
 
 /** Vimeo id for the hero VSL — keep in step with HERO_VIDEO_URL in LandingView. */
-const HERO_VIDEO_ID = "1209849931";
+const HERO_VIDEO_ID = "1212886806";
 /** Used only if Vimeo is unreachable at build time. */
 const POSTER_FALLBACK = "/Landing%20Thumbnail.webp";
 

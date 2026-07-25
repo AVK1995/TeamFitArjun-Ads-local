@@ -45,7 +45,7 @@ function handleLandingCtaClick() {
 // Vimeo player embed (NOT a self-hosted mp4) — plays are only recorded in Vimeo
 // Analytics when the video is served by Vimeo's own player.
 // Do NOT add `dnt=1` to the query string: it turns Vimeo's tracking off.
-const HERO_VIDEO_URL = "https://player.vimeo.com/video/1209849931";
+const HERO_VIDEO_URL = "https://player.vimeo.com/video/1212886806";
 const HERO_THUMB_URL = "/Landing%20Thumbnail.webp";
 
 interface Slide {
