@@ -22,3 +22,22 @@ export function extractUserAgent(request: Request): string {
 export function extractEventSourceUrl(request: Request, fallback: string): string {
   return request.headers.get("referer") ?? fallback;
 }
+
+/**
+ * Truncate a URL to its origin (scheme + host), dropping path and query.
+ *
+ * Required for every Meta CAPI event on this dataset: it is categorised
+ * "Health and wellness condition", and Meta's "core setup" tier strips the
+ * path/query server-side anyway. Sending it ourselves would only leak UTMs
+ * and path segments into a payload we want maximally neutral — see
+ * `clientConfig.capi.events`.
+ *
+ * Falls back to the production origin when the input is not a parseable URL.
+ */
+export function toOriginOnly(url: string, fallbackOrigin: string): string {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return fallbackOrigin;
+  }
+}

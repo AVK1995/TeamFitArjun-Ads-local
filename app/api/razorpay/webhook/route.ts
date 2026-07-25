@@ -205,7 +205,10 @@ export async function POST(request: Request): Promise<NextResponse> {
   const capiTask: Promise<boolean> = willFireCapi
     ? fireMetaCapi({
         customer,
-        eventNames: ["Purchase", "sales"],
+        // Custom event ONLY. The standard `Purchase` was removed when this
+        // dataset was categorised "Health and wellness condition" — Meta
+        // blocks standard events by name. See clientConfig.capi.events.
+        eventNames: [clientConfig.capi.events.purchase],
         eventId,
         value: valueRupees,
         currency: String(payment.currency ?? clientConfig.pricing.currency),

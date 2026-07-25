@@ -8,10 +8,16 @@
  * event_id + dedup flag. Failures are logged to the hidden `_Errors` tab so
  * the row remains retry-able.
  *
- * The tripwire Purchase + sales events for the ₹97 payment are fired separately
- * by the Next.js backend at payment-verify time. This script handles only the
+ * The tripwire `sales` event for the ₹97 payment is fired separately by the
+ * Next.js backend from the Razorpay webhook. This script handles only the
  * three downstream events. Both systems share the same Meta pixel + token but
  * never talk to each other directly — the Sheet is the only link.
+ *
+ * NOTE: the shared dataset is categorised "Health and wellness condition", so
+ * Meta blocks STANDARD event names. The three names below (CallBooked /
+ * CallDone / HighTicketPurchase) are custom names and are unaffected — but do
+ * not rename any of them to a standard Meta event, and keep their payloads
+ * free of product/condition strings.
  *
  * Source-of-truth schema: 36-column row, A..AJ (see README.md).
  */

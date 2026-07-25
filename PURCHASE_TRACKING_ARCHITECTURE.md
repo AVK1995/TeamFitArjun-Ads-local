@@ -12,6 +12,22 @@
 
 ---
 
+## ⚠️ Part 0 — Event-name override (this funnel is Health & Wellness-restricted)
+
+This dataset is categorised **"Health and wellness condition"** in Events Manager. Meta blocks mid/lower-funnel **standard events by name**, so **every CAPI event this funnel fires is a custom event.** Wherever the rest of this doc says `Purchase`, read `sales`:
+
+| Funnel step | Standard name (BANNED here) | What we actually fire |
+|---|---|---|
+| Landing CTA click | ~~`AddToCart`~~ | `atc_event` |
+| Pay clicked on /checkout | ~~`InitiateCheckout`~~ | `ic_event` |
+| Paid order | ~~`Purchase`~~ | `sales` (single event, was `[Purchase, sales]`) |
+
+Names are defined once in `clientConfig.capi.events`. Companion rules: `custom_data` carries `value`/`currency`/`payment_id` **only** (no `content_name`/`content_ids`/`content_type`), and `event_source_url` is truncated to origin via `toOriginOnly()`. Campaigns optimise on the custom events directly.
+
+**Everything else in this doc — the dedup contract, the delivery-reliability design, the EMQ payload — is unchanged.** A sibling funnel that is NOT restricted should use the standard names as written below.
+
+---
+
 ## Part 1 — The problem this architecture solves
 
 Naive implementations of post-purchase tracking **silently lose 30-70% of mobile conversions**. Three root causes, observed in production:

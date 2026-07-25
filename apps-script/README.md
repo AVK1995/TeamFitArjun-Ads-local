@@ -9,8 +9,12 @@ Meta Conversions API events when a sales-team-edited dropdown is set to TRUE:
 | `call_showed` (col AB) | `CallDone` | no |
 | `sale_closed` (col AF) | `HighTicketPurchase` | yes — `contracted_value` from col AG |
 
-The tripwire `Purchase` + `sales` events for the ₹97 Blueprint Call are fired
-separately by the Next.js backend at payment-verify time (see
+All three are **custom** event names, which matters: the shared dataset is
+categorised "Health and wellness condition" and Meta blocks standard event
+names. Do not rename any of them to a standard Meta event.
+
+The tripwire `sales` event for the ₹97 Blueprint Call is fired
+separately by the Next.js backend from the Razorpay webhook (see
 `PURCHASE_TRACKING_ARCHITECTURE.md` in the repo root). This script handles only
 the three downstream lifecycle events. The two systems share the same Meta
 pixel (`738176472687210`, "Arjun Pixel 2") + CAPI token but never talk to each

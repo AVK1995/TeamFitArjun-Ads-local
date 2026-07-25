@@ -8,6 +8,8 @@ import {
   normalizeNameForCapi,
 } from "./hash";
 import type { CustomerPayload } from "./types";
+import { toOriginOnly } from "./request";
+import { clientConfig } from "@/client.config";
 
 const META_GRAPH_VERSION = "v25.0";
 
@@ -16,9 +18,13 @@ interface FireCapiArgs {
   /**
    * Event names to fire in a single CAPI request. Each name becomes its own
    * entry in the `data: []` array — same event_id, same user_data, same
-   * custom_data, same event_source_url. For a paid order this is
-   * ["Purchase", "sales"]: the standard event drives campaign optimisation,
-   * the custom event acts as the source-of-truth count.
+   * custom_data, same event_source_url.
+   *
+   * ⚠️ CUSTOM NAMES ONLY. For a paid order this is `["sales"]` (from
+   * `clientConfig.capi.events.purchase`). The standard `Purchase` used to be
+   * paired here and was REMOVED: this dataset is categorised "Health and
+   * wellness condition" and Meta blocks standard events by name. Campaigns
+   * now optimise on `sales` directly. Do not re-add `Purchase`.
    */
   eventNames: string[];
   /**
@@ -43,8 +49,8 @@ interface FireCapiArgs {
  *
  * Returns true when Meta returned a 2xx, false otherwise. The caller uses
  * this only for structured logging; Meta deduplicates by event_id on its
- * side so retries from our fallback paths cannot cause Purchase/sales
- * duplicates in Events Manager.
+ * side so retries from our fallback paths cannot cause duplicate `sales`
+ * events in Events Manager.
  *
  * EMQ payload (target ≥ 9.5):
  *   - Hashed: em, ph, fn, ln, ct, country, external_id (= sha256(email))
@@ -80,7 +86,7 @@ export async function fireMetaCapi(args: FireCapiArgs): Promise<boolean> {
     userData.em = [emailHash];
     // external_id = sha256(normalised email). Identical to the browser MAM
     // cookie value so Meta links sessions across browser PageView and
-    // server Purchase/sales for the same user.
+    // the server `sales` event for the same user.
     userData.external_id = [emailHash];
   }
   if (args.customer.phone) {
@@ -115,7 +121,13 @@ export async function fireMetaCapi(args: FireCapiArgs): Promise<boolean> {
   const baseEvent = {
     event_time: Math.floor(Date.now() / 1000),
     event_id: args.eventId,
-    event_source_url: args.eventSourceUrl,
+    // Origin only — Meta's "core setup" tier strips the path/query on this
+    // restricted dataset anyway; sending it would only leak UTMs and path
+    // segments into a payload we want maximally neutral.
+    event_source_url: toOriginOnly(
+      args.eventSourceUrl,
+      `https://${clientConfig.brand.domain}`,
+    ),
     action_source: "website",
     user_data: userData,
     custom_data: customData,

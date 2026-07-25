@@ -10,7 +10,9 @@ import { buildVimeoSrc, forceUnmute, requestFullscreen } from "@/lib/video";
 /**
  * Shared handler for every landing CTA. Fires two independent events:
  *   1. GA4 `add_to_cart` — deduped inside trackGa4EventOnce by localStorage.
- *   2. Meta CAPI `AddToCart` — fired via sendBeacon so the request survives
+ *   2. Meta CAPI `atc_event` (custom — the standard `AddToCart` is blocked on
+ *      this Health & Wellness-restricted dataset) — fired via sendBeacon so
+ *      the request survives
  *      the CTA's navigation to /checkout. Deduped by localStorage.arjun_atc_fired.
  * Never blocks navigation; every step is best-effort.
  */

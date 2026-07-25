@@ -31,7 +31,7 @@ import { COUNTRIES, type Country } from "./countries";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-/** Web Crypto SHA-256 (hex) — used to dedup Meta CAPI InitiateCheckout by email. */
+/** Web Crypto SHA-256 (hex) — used to dedup the Meta CAPI `ic_event` by email. */
 async function sha256Hex(value: string): Promise<string> {
   if (typeof crypto === "undefined" || !crypto.subtle) return value;
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
@@ -269,7 +269,8 @@ export function CheckoutView() {
     }
     setLoading(true);
     const customer = collectCustomer();
-    // Meta CAPI InitiateCheckout — fires ONCE per email per browser, right
+    // Meta CAPI `ic_event` (custom — the standard `InitiateCheckout` is
+    // blocked on this H&W-restricted dataset) — fires ONCE per email per browser, right
     // before create-order + Razorpay open. Deduped by localStorage keyed on
     // sha256(email) so a different email in the same browser re-fires.
     // Failures never block payment; every step is best-effort.

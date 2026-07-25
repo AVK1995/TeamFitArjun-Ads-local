@@ -47,8 +47,8 @@ export function ThankYouView({ posterUrl = HERO_THUMB_URL }: { posterUrl?: strin
   const step = QUIZ_QUESTIONS[currentStep];
 
   // Sticky scroll + read submission-lock on mount.
-  // No browser Pixel events fire on /thank-you. The Purchase + sales events
-  // are fired server-side from /api/razorpay/verify-payment with a payload
+  // No browser Pixel events fire on /thank-you. The custom `sales` event is
+  // fired server-side from /api/razorpay/webhook with a payload
   // that hits EMQ ≥ 9.5. We do re-apply the arjun_mam cookie identity here
   // as a safety net so the PageView (fired from layout) carries hashed
   // matching even if the inline script raced the route change.

@@ -96,9 +96,10 @@ export default function RootLayout({
           the pixel with that hashed identity BEFORE PageView fires — so
           even cold returns ship PageView with em/ph/fn/ln/ct/country/external_id.
 
-          This is the ONLY browser event the funnel fires. Conversion
-          events (Purchase + sales) come from server CAPI in
-          /api/razorpay/verify-payment and /api/razorpay/webhook.
+          This is the ONLY browser event the funnel fires. Every conversion
+          event comes from server CAPI and every one is a CUSTOM event name
+          (atc_event / ic_event / sales) because this dataset is under Meta's
+          Health & Wellness restriction — see clientConfig.capi.events.
         */}
         {pixelId ? (
           <>

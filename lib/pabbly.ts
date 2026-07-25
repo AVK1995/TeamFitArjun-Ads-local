@@ -60,7 +60,7 @@ export async function firePabblyWebhook(args: {
 
   // external_id MUST be computed identically to the CAPI side
   // (sha256 of lowercase+trimmed email) so Meta links browser PageView,
-  // server Purchase/sales, and the downstream Apps Script events into one
+  // the server `sales` event, and the downstream Apps Script events into one
   // user. lib/capi.ts uses the same sha256Lower(email).
   const externalId = args.customer.email ? sha256Lower(args.customer.email) : "";
 

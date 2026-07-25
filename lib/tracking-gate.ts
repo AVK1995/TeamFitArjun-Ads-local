@@ -12,7 +12,7 @@ import { clientConfig } from "@/client.config";
  *      are ₹97 so they pass; test transactions priced at ₹1 are dropped.
  *
  * Browser PageView is gated by HOST only (no amount exists pre-purchase).
- * Server conversion events (CAPI Purchase + sales, Pabbly purchase) are
+ * Server conversion events (CAPI `sales`, Pabbly purchase) are
  * gated by BOTH host and amount.
  */
 

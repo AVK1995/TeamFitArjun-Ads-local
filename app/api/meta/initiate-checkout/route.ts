@@ -18,16 +18,20 @@ interface InitiateCheckoutBody {
 }
 
 /**
- * Server-side CAPI `InitiateCheckout` — fired when the visitor clicks Pay
+ * Server-side CAPI `ic_event` — fired when the visitor clicks Pay
  * on /checkout AFTER validation passes (client-side dedup: one per email
  * per browser via localStorage).
+ *
+ * CUSTOM event name (from clientConfig.capi.events.initiateCheckout), not
+ * Meta's standard `InitiateCheckout`: this dataset is categorised "Health and
+ * wellness condition" and Meta blocks standard events by name.
  *
  * Full 11-signal EMQ payload:
  *   - hashed em, ph, fn, ln, ct, country, external_id (= sha256(email))
  *   - raw fbc, fbp, client_ip_address, client_user_agent
  *
- * `external_id` uses the SAME derivation as Purchase in lib/capi.ts so Meta
- * stitches this visitor's IC and Purchase into one identity.
+ * `external_id` uses the SAME derivation as `sales` in lib/capi.ts so Meta
+ * stitches this visitor's intent and purchase into one identity.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   let body: InitiateCheckoutBody;

@@ -12,13 +12,17 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Server-side CAPI `AddToCart` — fired when a visitor clicks any landing CTA.
+ * Server-side CAPI `atc_event` — fired when a visitor clicks any landing CTA.
+ *
+ * CUSTOM event name (from clientConfig.capi.events.addToCart), not Meta's
+ * standard `AddToCart`: this dataset is categorised "Health and wellness
+ * condition" and Meta blocks standard events by name.
  *
  * Client role: trigger only. The browser sends this POST via `sendBeacon` (or
  * `fetch keepalive`) so the request survives the CTA's navigation to
  * `/checkout`. All hashing + Meta Graph API POST happens here.
  *
- * Gates (identical to the Purchase pipeline in verify-payment):
+ * Gates (identical to the `sales` pipeline in the Razorpay webhook):
  *   - production host (`teamfitarjun.com`) — preview + localhost skip
  *   - amount > ₹1 — ₹1 test transactions skip
  *

@@ -9,18 +9,28 @@ import {
   normalizeNameForCapi,
 } from "./hash";
 import type { CustomerPayload } from "./types";
+import { toOriginOnly } from "./request";
 import { clientConfig } from "@/client.config";
 
 /**
  * Standalone senders for the upper-funnel intent events:
- *   - AddToCart      → fired when a visitor clicks any landing CTA
- *   - InitiateCheckout → fired when a visitor clicks Pay on /checkout
+ *   - `atc_event` → fired when a visitor clicks any landing CTA
+ *   - `ic_event`  → fired when a visitor clicks Pay on /checkout
  *
  * Kept in a sibling module (not merged into lib/capi.ts) so the
- * bottom-of-funnel Purchase + sales pipeline stays byte-for-byte untouched.
- * Both events use Meta's STANDARD names (this funnel is NOT in the Health
- * & Wellness restricted category — the existing Purchase event ships full
- * hashed PII, so we mirror that here).
+ * bottom-of-funnel `sales` pipeline stays independent.
+ *
+ * ⚠️ BOTH ARE CUSTOM EVENT NAMES, NOT STANDARD ONES. This dataset is
+ * categorised "Health and wellness condition" in Events Manager, and Meta
+ * blocks mid/lower-funnel STANDARD events by name — `AddToCart` and
+ * `InitiateCheckout` (the names these previously used) are both on that list.
+ * Confirmed custom events with PHI-free payloads are not. Names come from
+ * `clientConfig.capi.events` — never hardcode a standard name here.
+ *
+ * Payload is deliberately minimal (`value` + `currency` only, no
+ * `content_name` / `content_ids` / `content_type`) so Meta has nothing
+ * product- or category-shaped to scan and flag the custom event as sensitive.
+ * `event_source_url` is truncated to origin for the same reason.
  *
  * Deduplication (two layers, both enforced by the caller):
  *   1. Client-side: localStorage flag (`arjun_atc_fired`, `arjun_ic_fired`).
@@ -29,6 +39,11 @@ import { clientConfig } from "@/client.config";
  */
 
 const META_GRAPH_VERSION = "v25.0";
+
+/** Restricted-dataset rule: ship origin only, never path/query. */
+function originOnly(url: string): string {
+  return toOriginOnly(url, `https://${clientConfig.brand.domain}`);
+}
 
 interface CommonArgs {
   eventSourceUrl: string;
@@ -118,21 +133,21 @@ export async function sendAddToCartEvent(
   if (args.fbc) userData.fbc = args.fbc;
   if (args.fbp) userData.fbp = args.fbp;
 
+  // Neutral payload only — see module header. No content_name / content_ids /
+  // content_type: product strings are what get a custom event scanned and
+  // filtered as sensitive on a restricted dataset.
   const customData: Record<string, unknown> = {
     currency: clientConfig.pricing.currency,
     value: clientConfig.pricing.price,
-    content_ids: [clientConfig.capi.contentId],
-    content_name: clientConfig.capi.contentName,
-    content_type: "product",
   };
 
   const body: Record<string, unknown> = {
     data: [
       {
-        event_name: "AddToCart",
+        event_name: clientConfig.capi.events.addToCart,
         event_time: Math.floor(Date.now() / 1000),
         event_id: eventId,
-        event_source_url: args.eventSourceUrl,
+        event_source_url: originOnly(args.eventSourceUrl),
         action_source: "website",
         user_data: userData,
         custom_data: customData,
@@ -158,8 +173,8 @@ export async function sendInitiateCheckoutEvent(
   if (customer.email) {
     const emailHash = sha256Lower(customer.email);
     userData.em = [emailHash];
-    // external_id derivation MUST match Purchase (lib/capi.ts) so Meta
-    // stitches this visitor's IC and Purchase into one identity.
+    // external_id derivation MUST match the `sales` event (lib/capi.ts) so
+    // Meta stitches this visitor's intent and purchase into one identity.
     userData.external_id = [emailHash];
   }
   if (customer.phone) {
@@ -188,21 +203,19 @@ export async function sendInitiateCheckoutEvent(
   if (args.fbc) userData.fbc = args.fbc;
   if (args.fbp) userData.fbp = args.fbp;
 
+  // Neutral payload only — see module header.
   const customData: Record<string, unknown> = {
     currency: clientConfig.pricing.currency,
     value: clientConfig.pricing.price,
-    content_ids: [clientConfig.capi.contentId],
-    content_name: clientConfig.capi.contentName,
-    content_type: "product",
   };
 
   const body: Record<string, unknown> = {
     data: [
       {
-        event_name: "InitiateCheckout",
+        event_name: clientConfig.capi.events.initiateCheckout,
         event_time: Math.floor(Date.now() / 1000),
         event_id: eventId,
-        event_source_url: args.eventSourceUrl,
+        event_source_url: originOnly(args.eventSourceUrl),
         action_source: "website",
         user_data: userData,
         custom_data: customData,
