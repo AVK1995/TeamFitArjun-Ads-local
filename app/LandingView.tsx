@@ -77,12 +77,12 @@ const ROW_2: Slide[] = [
 
 const TESTIMONIALS = [
   {
-    name: "Ankush Ramnani",
-    meta: "23 · Australia",
-    before: "/Ankush%20Ramnani%20Before.png",
-    after: "/Ankush%20Ramnani%20after.png",
+    name: "Manish",
+    meta: "34 · Pune",
+    before: "/Manish%20before.png",
+    after: "/Manish%20after.png",
     quote:
-      "Stuck skinny-fat despite extreme work hours and failed attempts. Ankush followed a fully customized system built by Arjun that adapted even through surgery, ultimately achieving a shredded six-pack physique with full control over his body.",
+      "Struggling with stress, thyroid fluctuations and life disruptions, Manish followed a flexible system designed by Arjun that sustained consistency, helping him reach photoshoot-level conditioning with confidence.",
     delay: undefined,
   },
   {
@@ -95,22 +95,13 @@ const TESTIMONIALS = [
     delay: ".08s",
   },
   {
-    name: "Manish",
-    meta: "34 · Pune",
-    before: "/Manish%20before.png",
-    after: "/Manish%20after.png",
-    quote:
-      "Struggling with stress, thyroid fluctuations and life disruptions, Manish followed a flexible system designed by Arjun that sustained consistency, helping him reach photoshoot-level conditioning with confidence.",
-    delay: ".16s",
-  },
-  {
     name: "Rohan Mehra",
     meta: "Toronto, Canada",
     before: "/Rohan%20before.png",
     after: "/Rohan%20after.png",
     quote:
       "After 10 years of ineffective workouts, Rohan followed Arjun's structured approach to nutrition, tracking and accountability, finally achieving a lean physique with visible abs that he maintains long-term.",
-    delay: ".24s",
+    delay: ".16s",
   },
 ];
 

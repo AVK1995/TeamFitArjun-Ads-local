@@ -466,7 +466,7 @@
 .af-root .af-proof h2{ text-align:center!important; font-size:clamp(26px,4vw,40px)!important; margin-bottom:46px!important; }
 .af-root .af-proof h2 em{ font-style:normal; color:var(--brand,#9A6614)!important; }
 
-.af-root .af-tcards{ display:grid; grid-template-columns:repeat(2,1fr); gap:24px; max-width:860px; margin:0 auto; }
+.af-root .af-tcards{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:1120px; margin:0 auto; }
 
 /* Summary card style (+1,295 More Transformations) */
 .af-root .af-tcard-more{
@@ -1089,7 +1089,7 @@ body.admin-bar .af-root .af-lbox-close{ top:52px!important; }
   .af-root .af-skim-photos .af-photo{ flex:1; }
   .af-root .af-photo-r2{ margin-left:0; }
   .af-root .af-offer-grid{ grid-template-columns:1fr 1fr; }
-  .af-root .af-tcards{ grid-template-columns:repeat(2,1fr); }
+  .af-root .af-tcards{ grid-template-columns:1fr; }
   .af-root .af-about-grid{ grid-template-columns:1fr; }
   /* When stacked, center everything in the right column so it
      visually aligns with the centered photo above it. !important
