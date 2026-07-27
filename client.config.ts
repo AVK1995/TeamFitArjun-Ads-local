@@ -53,7 +53,7 @@ export const clientConfig = {
   event: {
     timezone: "Asia/Kolkata",
     /** Calendly URL the user is sent to immediately after payment */
-    calendlyUrl: "https://calendly.com/thefitarjun/30min",
+    calendlyUrl: "https://calendly.com/thefitarjun/arjun-fitness-ads",
   },
 
   funnel: {
