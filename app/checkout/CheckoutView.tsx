@@ -18,6 +18,7 @@ import {
 } from "@/lib/utm";
 import { setMetaAdvancedMatching } from "@/lib/analytics";
 import { trackGa4EventOnce } from "@/lib/ga4";
+import { fireConfetti } from "@/lib/confetti";
 import type {
   CreateOrderResponse,
   CustomerPayload,
@@ -86,13 +87,17 @@ export function CheckoutView() {
   const [flagOpen, setFlagOpen] = useState(false);
   const [flagSearch, setFlagSearch] = useState("");
   const [couponOpen, setCouponOpen] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  // Expanded by default. Desktop forces it open via CSS and hides the toggle,
+  // so this only affects mobile — where the user can still collapse it.
+  const [detailsOpen, setDetailsOpen] = useState(true);
   const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
   const [couponInput, setCouponInput] = useState("");
   const [couponMsg, setCouponMsg] = useState<{ text: string; tone: "error" | "success" } | null>(null);
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const [sdkReady, setSdkReady] = useState(false);
+  const [offerTime, setOfferTime] = useState("15:00");
+  const [changeCodeOpen, setChangeCodeOpen] = useState(false);
   const flagBoxRef = useRef<HTMLDivElement>(null);
 
   // Read UTM once on mount — used in API calls + Razorpay notes + Pabbly
@@ -117,6 +122,34 @@ export function CheckoutView() {
       }
     }, 200);
     return () => window.clearInterval(id);
+  }, []);
+
+  // Confetti on arrival — this page is only reached by clicking a funnel CTA,
+  // so the burst celebrates the "special offer unlocked" the moment it loads.
+  useEffect(() => {
+    fireConfetti();
+  }, []);
+
+  // Special-offer countdown. Loops back to full on reaching zero so the offer
+  // never actually expires (matches the hero timer's behaviour).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const DURATION = clientConfig.offer.windowMinutes * 60 * 1000;
+    let started = Date.now();
+    const tick = () => {
+      let remaining = started + DURATION - Date.now();
+      if (remaining <= 0) {
+        started = Date.now();
+        remaining = DURATION;
+      }
+      const s = Math.floor(remaining / 1000);
+      setOfferTime(
+        `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`,
+      );
+    };
+    tick();
+    const timer = window.setInterval(tick, 1000);
+    return () => window.clearInterval(timer);
   }, []);
 
   // Reveal-on-scroll (matches data-af-reveal in the source HTML)
@@ -242,6 +275,15 @@ export function CheckoutView() {
   const total = basePrice - (coupon?.discount ?? 0);
   const formattedTotal = formatINR(total);
   const formattedDiscount = formatINR(coupon?.discount ?? 0);
+
+  // ── Special-offer box (display only — never changes what Razorpay charges) ──
+  const offerOriginal = clientConfig.offer.originalPrice; // struck "before" price
+  const offerSaving = Math.max(0, offerOriginal - basePrice); // "you save ₹X"
+  const offerPct =
+    offerOriginal > basePrice
+      ? Math.round(((offerOriginal - basePrice) / offerOriginal) * 1000) / 10 // 1 dp
+      : 0;
+  const offerCode = clientConfig.offer.code;
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -479,7 +521,102 @@ export function CheckoutView() {
               <input type="hidden" name="landing_url" value={utm.landing_url ?? ""} readOnly />
               <input type="hidden" name="country_code" value={country.dial} readOnly />
 
-              <div className="co-card" data-af-reveal>
+              {/* ── Special-offer banner ── */}
+              <div className="co-offer-banner" data-af-reveal>
+                <span className="co-offer-ic" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="8" width="18" height="4" rx="1" />
+                    <path d="M12 8v13" />
+                    <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
+                    <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" />
+                  </svg>
+                </span>
+                <div className="co-offer-banner-text">
+                  <strong>You just unlocked a special offer!</strong>
+                  <span>
+                    Exclusive price applied just for you with code{" "}
+                    <b className="co-offer-code">{offerCode}</b>
+                  </span>
+                </div>
+              </div>
+
+              {/* ── Special-offer box ── */}
+              <div className="co-offer-box" data-af-reveal style={{ "--d": ".05s" } as React.CSSProperties}>
+                <div className="co-offer-timer">
+                  <span className="co-offer-timer-lbl">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M5 22h14M5 2h14M17 22v-4.2a2 2 0 0 0-.6-1.4L12 12l-4.4 4.4a2 2 0 0 0-.6 1.4V22M7 2v4.2a2 2 0 0 0 .6 1.4L12 12l4.4-4.4A2 2 0 0 0 17 6.2V2" />
+                    </svg>
+                    Offer may end in:
+                  </span>
+                  <span className="co-offer-timer-val">{offerTime}</span>
+                </div>
+
+                <div className="co-offer-unlocked">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="4" y="11" width="16" height="10" rx="2" />
+                    <path d="M8 11V7a4 4 0 0 1 7.5-2" />
+                  </svg>
+                  Special Price Unlocked!
+                </div>
+
+                <div className="co-offer-price">
+                  <div className="co-offer-price-left">
+                    <span className="co-offer-was">{formatINR(offerOriginal)}</span>
+                    <span className="co-offer-off">{offerPct}% OFF</span>
+                  </div>
+                  <span className="co-offer-now">{formatINR(basePrice)}</span>
+                </div>
+
+                <div className="co-offer-applied">
+                  <span className="co-offer-applied-ic" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0l-7.2-7.2a2 2 0 0 1-.6-1.4V4.8a2 2 0 0 1 2-2h7.2a2 2 0 0 1 1.4.6l7.2 7.2a2 2 0 0 1 0 2.8z" />
+                      <circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" />
+                    </svg>
+                  </span>
+                  <span className="co-offer-applied-text">
+                    <b>{offerCode}</b> applied — saving {formatINR(offerSaving)}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  className="co-offer-change"
+                  onClick={() => setChangeCodeOpen((v) => !v)}
+                  aria-expanded={changeCodeOpen}
+                >
+                  {changeCodeOpen ? "Keep this offer" : "Change coupon code"}
+                </button>
+
+                {changeCodeOpen ? (
+                  <div className="co-offer-change-row">
+                    <input
+                      type="text"
+                      className="co-coupon-input"
+                      placeholder="ENTER CODE"
+                      autoComplete="off"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        // Enter inside the form would submit → trigger payment.
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          applyCoupon();
+                        }
+                      }}
+                    />
+                    <button type="button" className="co-coupon-apply" onClick={applyCoupon}>
+                      Apply
+                    </button>
+                  </div>
+                ) : null}
+                {couponMsg ? (
+                  <p className={`co-coupon-msg ${couponMsg.tone}`}>{couponMsg.text}</p>
+                ) : null}
+              </div>
+
+              <div className="co-card" data-af-reveal style={{ "--d": ".1s" } as React.CSSProperties}>
                 <div className="co-step-head">
                   <div className="co-step-num">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -688,62 +825,7 @@ export function CheckoutView() {
                   />
                 </div>
 
-                <div className="co-trust-row">
-                  <div className="co-trust-chip">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect x="3" y="11" width="18" height="11" rx="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                    SSL Secure
-                  </div>
-                  <div className="co-trust-chip">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M12 2l8 3v7c0 4.97-3.35 9.26-8 10-4.65-.74-8-5.03-8-10V5l8-3z" />
-                    </svg>
-                    Verified
-                  </div>
-                  <div className="co-trust-chip">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                    Protected
-                  </div>
-                  <div className="co-trust-chip">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 6v6l4 2" />
-                    </svg>
-                    Instant
-                  </div>
-                </div>
+                <PaymentMethods />
               </div>
             </form>
 
@@ -780,7 +862,9 @@ export function CheckoutView() {
                   <div className="co-prod-info">
                     <div className="co-prod-title">
                       <h4 id="co-prod-name">1:1 Blueprint Call with Arjun</h4>
-                      <span className="co-prod-price">{formatINR(basePrice)}</span>
+                      <span className="co-prod-price">
+                        <StruckPrice was={formatINR(offerOriginal)} now={formatINR(basePrice)} />
+                      </span>
                     </div>
                     <button
                       type="button"
@@ -822,7 +906,7 @@ export function CheckoutView() {
                   <div className="co-price-row sale">
                     <span className="lbl">Diagnostic Call</span>
                     <span className="val" id="co-sale-price">
-                      {formatINR(basePrice)}
+                      <StruckPrice was={formatINR(offerOriginal)} now={formatINR(basePrice)} />
                     </span>
                   </div>
                   <div
@@ -834,13 +918,6 @@ export function CheckoutView() {
                       -{formattedDiscount}
                     </span>
                   </div>
-                  <div className="co-divider" />
-                </div>
-                <div className="co-total-row">
-                  <span className="lbl">Total Today</span>
-                  <span className="val-group">
-                    <span className="new" id="co-total">{formattedTotal}</span>
-                  </span>
                 </div>
 
                 <div className="co-coupon">
@@ -943,6 +1020,123 @@ export function CheckoutView() {
                   </div>
                 </div>
 
+                </div>
+                </div>
+                {/* ↑ end .co-sum-collapse — pay button and below stay visible */}
+
+                <button
+                  type="submit"
+                  form="co-form"
+                  className={`co-pay-btn ${loading ? "loading" : ""}`}
+                  disabled={loading}
+                >
+                  <span className="spinner" />
+                  <span className="pay-lbl">
+                    Pay <span className="co-pay-was">{formatINR(offerOriginal)}</span>{" "}
+                    <span id="co-btn-amt" className="co-pay-now">{formattedTotal}</span> and Book My Call
+                  </span>
+                  <span className="arrow">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#fff"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12h14M13 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </button>
+
+                {/* Payment-security strip directly under the pay button */}
+                <ul className="co-paytrust">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    256-bit SSL
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2.5l7.5 2.8v6.4c0 4.6-3.1 8.6-7.5 9.3-4.4-.7-7.5-4.7-7.5-9.3V5.3L12 2.5z" />
+                      <path d="M8.8 12.1l2.2 2.2 4.2-4.4" />
+                    </svg>
+                    PCI Compliant
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 12a9 9 0 1 0 3-6.7" />
+                      <path d="M3 4v4.5h4.5" />
+                    </svg>
+                    100% Refundable
+                  </li>
+                </ul>
+
+                <div
+                  className={`co-redirect ${redirecting ? "on" : ""}`}
+                  id="co-redirect"
+                >
+                  <span>Redirecting to secure payment</span>
+                  <span className="dots">
+                    <span />
+                    <span />
+                    <span />
+                  </span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 04 — Sticky Mobile Pay CTA */}
+      <div className="co-sticky on" id="co-sticky">
+        <div className="co-sticky-inner">
+          <button
+            type="submit"
+            form="co-form"
+            className={`co-pay-btn ${loading ? "loading" : ""}`}
+            disabled={loading}
+          >
+            <span className="spinner" />
+            <span className="pay-lbl">
+              Pay <span className="co-pay-was">{formatINR(offerOriginal)}</span>{" "}
+              <span id="co-sticky-amt" className="co-pay-now">{formattedTotal}</span> &amp; Book Your Slot
+            </span>
+            <span className="arrow">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#fff"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14M13 5l7 7-7 7" />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Struck "before" price + current price (e.g. ₹999  ₹97) ─── */
+function StruckPrice({ was, now }: { was: string; now: string }) {
+  return (
+    <span className="co-struck">
+      <span className="co-struck-was">{was}</span>
+      <span className="co-struck-now">{now}</span>
+    </span>
+  );
+}
+
+/* ─── Accepted-payment-methods badge strip (moved out of the summary) ─── */
+function PaymentMethods() {
+  return (
                 <div className="co-pm">
                   <span className="lbl">Accepted Payment Methods</span>
                   <span className="pm-badge" title="UPI">
@@ -1035,106 +1229,6 @@ export function CheckoutView() {
                     WALLETS
                   </span>
                 </div>
-
-                </div>
-                </div>
-                {/* ↑ end .co-sum-collapse — pay button and below stay visible */}
-
-                <button
-                  type="submit"
-                  form="co-form"
-                  className={`co-pay-btn ${loading ? "loading" : ""}`}
-                  disabled={loading}
-                >
-                  <span className="spinner" />
-                  <span className="pay-lbl">
-                    Pay <span id="co-btn-amt">{formattedTotal}</span> and Book My Call
-                  </span>
-                  <span className="arrow">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#fff"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M5 12h14M13 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </button>
-
-                {/* Payment-security strip directly under the pay button */}
-                <ul className="co-paytrust">
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="11" width="18" height="11" rx="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                    256-bit SSL
-                  </li>
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 2.5l7.5 2.8v6.4c0 4.6-3.1 8.6-7.5 9.3-4.4-.7-7.5-4.7-7.5-9.3V5.3L12 2.5z" />
-                      <path d="M8.8 12.1l2.2 2.2 4.2-4.4" />
-                    </svg>
-                    PCI Compliant
-                  </li>
-                  <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M3 12a9 9 0 1 0 3-6.7" />
-                      <path d="M3 4v4.5h4.5" />
-                    </svg>
-                    100% Refundable
-                  </li>
-                </ul>
-
-                <div
-                  className={`co-redirect ${redirecting ? "on" : ""}`}
-                  id="co-redirect"
-                >
-                  <span>Redirecting to secure payment</span>
-                  <span className="dots">
-                    <span />
-                    <span />
-                    <span />
-                  </span>
-                </div>
-              </div>
-            </aside>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 04 — Sticky Mobile Pay CTA */}
-      <div className="co-sticky on" id="co-sticky">
-        <div className="co-sticky-inner">
-          <button
-            type="submit"
-            form="co-form"
-            className={`co-pay-btn ${loading ? "loading" : ""}`}
-            disabled={loading}
-          >
-            <span className="spinner" />
-            <span className="pay-lbl">
-              Pay <span id="co-sticky-amt">{formattedTotal}</span> &amp; Book Your Slot
-            </span>
-            <span className="arrow">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#fff"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14M13 5l7 7-7 7" />
-              </svg>
-            </span>
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }
 

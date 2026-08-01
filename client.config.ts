@@ -19,6 +19,20 @@ const PRICE_FROM_ENV = (() => {
   return Number.isFinite(n) && n > 0 ? n : 97;
 })();
 
+/**
+ * The struck-through "before" price shown in the checkout special-offer box.
+ * DISPLAY ONLY — the amount actually charged is always `pricing.price`. This
+ * just drives the "X% OFF" badge and the "you save ₹Y" line. Set via
+ * NEXT_PUBLIC_OFFER_ORIGINAL_PRICE so the client can tune it without a code
+ * change; falls back to 499.
+ */
+const OFFER_ORIGINAL_FROM_ENV = (() => {
+  const raw = process.env.NEXT_PUBLIC_OFFER_ORIGINAL_PRICE;
+  if (!raw) return 999;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : 999;
+})();
+
 export const clientConfig = {
   brand: {
     name: "TeamFitArjun",
@@ -48,6 +62,19 @@ export const clientConfig = {
     get paise(): number {
       return this.price * 100;
     },
+  },
+
+  /**
+   * Checkout special-offer box. Purely presentational urgency — none of this
+   * changes what Razorpay charges (`pricing.price`).
+   */
+  offer: {
+    /** Struck-through "before" price. Set via NEXT_PUBLIC_OFFER_ORIGINAL_PRICE. */
+    originalPrice: OFFER_ORIGINAL_FROM_ENV,
+    /** Static, pre-applied promo code shown as "unlocked". Cosmetic. */
+    code: "uwpxkowyzpqx",
+    /** Countdown length in minutes; loops back to full on reaching zero. */
+    windowMinutes: 15,
   },
 
   event: {
