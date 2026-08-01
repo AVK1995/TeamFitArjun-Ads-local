@@ -1123,3 +1123,227 @@
   .af-root .co-expect-list li::before{ width:22px!important; height:22px!important; font-size:10.5px!important; }
 }
 
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   CHECKOUT SPECIAL-OFFER BLOCK  (confetti fires from JS on mount)
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   Layout intent:
+     Desktop â€” offer banner + box sit at the TOP of the left form column, so
+       "Your Details" moves below them.
+     Mobile  â€” the left form comes after the order summary; the summary's own
+       pay button + trust strip are hidden (the sticky bar covers the CTA), so
+       the offer block lands right where that CTA used to be.
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+/* â”€â”€ Banner â”€â”€ */
+.af-root .co-offer-banner{
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px; margin:0 0 14px;
+  border-radius:var(--r,16px);
+  background:linear-gradient(180deg,#FFFDF8 0%,#FBF1DE 100%);
+  border:1px solid rgba(154,102,20,.30);
+  box-shadow:0 4px 14px rgba(154,102,20,.12), inset 0 1px 0 rgba(255,255,255,.85);
+}
+/* Themed gift icon in a raised gold chip (replaces the 🎉 emoji). */
+.af-root .co-offer-ic{
+  flex:0 0 38px; width:38px; height:38px; border-radius:11px;
+  display:grid; place-items:center; color:var(--brand,#9A6614);
+  background:linear-gradient(180deg,#FFF9EC 0%,#F3E2C4 100%);
+  border:1px solid rgba(154,102,20,.30);
+  box-shadow:
+    0 4px 9px rgba(154,102,20,.22),
+    inset 0 1.5px 0 rgba(255,255,255,.95),
+    inset 0 -2px 0 rgba(154,102,20,.18);
+}
+.af-root .co-offer-ic svg{ width:20px; height:20px; }
+.af-root .co-offer-banner-text{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.af-root .co-offer-banner-text strong{
+  font-family:var(--fb)!important; font-size:14.5px; font-weight:800;
+  color:var(--brand-deep,#7C5210);
+}
+.af-root .co-offer-banner-text span{
+  font-size:12.5px; line-height:1.45; color:var(--ink-soft,#544E45);
+}
+.af-root .co-offer-code{
+  font-family:ui-monospace,"SFMono-Regular",Menlo,monospace;
+  font-weight:700; letter-spacing:.02em; color:var(--ink,#1C1710);
+  word-break:break-all;
+}
+
+/* â”€â”€ Offer box â”€â”€ */
+.af-root .co-offer-box{
+  position:relative; overflow:hidden;
+  padding:18px 18px 16px; margin:0 0 18px;
+  border-radius:var(--r-lg,24px);
+  background:linear-gradient(180deg,#FFFDF8 0%,#FBF1DE 100%);
+  border:1.5px solid rgba(154,102,20,.34);
+  box-shadow:
+    0 10px 30px rgba(154,102,20,.16),
+    0 0 0 4px rgba(201,149,77,.08),
+    inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+/* Countdown row — solid neon-red bar (matches the hero timer language) */
+.af-root .co-offer-timer{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:9px 12px; margin:0 0 14px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#DC2626,#EF4444);
+  border:1.5px solid rgba(153,27,27,.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.28),
+    0 0 20px rgba(239,68,68,.45),
+    0 4px 12px rgba(185,28,28,.30);
+}
+.af-root .co-offer-timer-lbl{
+  display:inline-flex; align-items:center; gap:7px;
+  font-size:11.5px; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
+  color:#fff;
+  text-shadow:0 1px 1px rgba(127,29,29,.5);
+}
+.af-root .co-offer-timer-lbl svg{ width:14px; height:14px; flex:0 0 14px; }
+/* Digit pill — a deeper red on the bright bar, white digits, pulsing glow */
+.af-root .co-offer-timer-val{
+  font-family:var(--fb)!important; font-variant-numeric:tabular-nums;
+  font-size:16px; font-weight:900; letter-spacing:.06em; color:#fff;
+  padding:3px 12px; border-radius:8px;
+  background:linear-gradient(180deg,#B91C1C 0%,#991B1B 100%);
+  border:1px solid rgba(120,20,20,.65);
+  text-shadow:0 1px 2px rgba(80,10,10,.7);
+  box-shadow:
+    0 0 10px rgba(255,90,90,.55),
+    inset 0 1px 0 rgba(255,255,255,.28),
+    inset 0 -2px 0 rgba(80,10,10,.4);
+  animation:coTimerGlow 1.8s ease-in-out infinite;
+  min-width:64px; text-align:center;
+}
+
+/* "Special price unlocked" line */
+.af-root .co-offer-unlocked{
+  display:flex; align-items:center; gap:8px;
+  font-family:var(--fb)!important; font-size:12.5px; font-weight:800;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--brand-deep,#7C5210);
+  margin:0 0 12px;
+}
+.af-root .co-offer-unlocked svg{ width:16px; height:16px; flex:0 0 16px; color:var(--brand,#9A6614); }
+
+/* Price row: struck original + % off on the left, big current on the right */
+.af-root .co-offer-price{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  padding:0 0 14px; margin:0 0 14px;
+  border-bottom:1px dashed var(--border-strong,#D9CCB4);
+}
+.af-root .co-offer-price-left{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.af-root .co-offer-was{
+  font-family:var(--fh,'Playfair Display',serif)!important;
+  font-size:19px; color:var(--muted,#847C6F); text-decoration:line-through;
+  text-decoration-thickness:2px;
+}
+.af-root .co-offer-off{
+  font-size:11px; font-weight:800; letter-spacing:.02em; color:#fff;
+  padding:3px 9px 4px; border-radius:999px;
+  background:linear-gradient(180deg,#EF4444,#DC2626);
+  box-shadow:0 2px 6px rgba(220,38,38,.30);
+  white-space:nowrap;
+}
+.af-root .co-offer-now{
+  font-family:var(--fh,'Playfair Display',serif)!important;
+  font-size:34px; font-weight:700; line-height:1; color:var(--brand,#9A6614);
+}
+
+/* Applied-code confirmation row */
+.af-root .co-offer-applied{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:12px;
+  background:rgba(201,149,77,.10); border:1px solid rgba(154,102,20,.24);
+}
+.af-root .co-offer-applied-ic{
+  flex:0 0 26px; width:26px; height:26px; border-radius:8px;
+  display:grid; place-items:center; color:var(--brand,#9A6614);
+  background:#fff; border:1px solid rgba(154,102,20,.26);
+}
+.af-root .co-offer-applied-ic svg{ width:15px; height:15px; }
+.af-root .co-offer-applied-text{ font-size:13px; color:var(--ink-soft,#544E45); }
+.af-root .co-offer-applied-text b{
+  font-family:ui-monospace,"SFMono-Regular",Menlo,monospace;
+  color:var(--ink,#1C1710); font-weight:700; word-break:break-all;
+}
+
+/* Change-coupon toggle + inline input */
+.af-root .co-offer-change{
+  display:inline-block; margin:12px 0 0; padding:0; border:0; background:none;
+  font-size:12.5px; font-weight:700; color:var(--brand,#9A6614);
+  text-decoration:underline; text-underline-offset:3px; cursor:pointer;
+}
+.af-root .co-offer-change:hover{ color:var(--brand-deep,#7C5210); }
+.af-root .co-offer-change-row{
+  display:flex; gap:8px; margin-top:10px;
+}
+.af-root .co-offer-change-row .co-coupon-input{ flex:1 1 auto; }
+
+/* â”€â”€ Accepted-payment-methods strip, now living in the form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* It carries the same .co-pm / .pm-badge styles as before; just give it the
+   spacing it needs in its new home (where the trust pills were). */
+.af-root .co-form .co-pm{
+  margin-top:20px; padding-top:18px;
+  border-top:1px solid var(--border,#EBE2D0);
+}
+
+/* â”€â”€ Mobile: hide the in-page CTA + trust strip (sticky bar handles it) â”€â”€â”€â”€ */
+@media (max-width:900px){
+  .af-root .co-summary .co-pay-btn,
+  .af-root .co-summary .co-paytrust{
+    display:none!important;
+  }
+  /* The offer box carries the urgency on mobile, so tighten its top gap to the
+     summary that now sits above it. */
+  .af-root .co-offer-banner{ margin-top:4px; }
+}
+
+/* â”€â”€ Small phones â”€â”€ */
+@media (max-width:520px){
+  .af-root .co-offer-box{ padding:16px 14px 14px; }
+  .af-root .co-offer-now{ font-size:30px; }
+  .af-root .co-offer-was{ font-size:17px; }
+  .af-root .co-offer-timer-val{ font-size:15px; min-width:58px; }
+  .af-root .co-offer-banner-text strong{ font-size:13.5px; }
+  .af-root .co-offer-banner-text span{ font-size:11.5px; }
+  .af-root .co-offer-ic{ flex:0 0 34px; width:34px; height:34px; border-radius:10px; }
+  .af-root .co-offer-ic svg{ width:18px; height:18px; }
+}
+
+
+/* ── Hide the order-summary "+ Apply code" toggle ──────────────────────────
+   The special-offer box now owns coupon entry via its "Change coupon code"
+   link, so this second, redundant coupon UI in the summary is hidden. The
+   class match is exact — .co-coupon-input / -apply / -msg (reused by the offer
+   box) are different class strings and are NOT affected. */
+.af-root .co-coupon{ display:none !important; }
+
+/* ── Neon-red timer glow pulse ─────────────────────────────────────────── */
+@keyframes coTimerGlow{
+  0%,100%{ box-shadow:0 0 10px rgba(255,90,90,.50), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -2px 0 rgba(80,10,10,.4); }
+  50%    { box-shadow:0 0 18px rgba(255,90,90,.85), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -2px 0 rgba(80,10,10,.4); }
+}
+@media (prefers-reduced-motion:reduce){
+  .af-root .co-offer-timer-val{ animation:none!important; }
+}
+
+/* ── Struck "before" price + current price (₹999  ₹97) ─────────────────── */
+.af-root .co-struck{ display:inline-flex; align-items:baseline; gap:8px; white-space:nowrap; }
+.af-root .co-struck-was{
+  color:var(--muted,#847C6F)!important;
+  text-decoration:line-through; text-decoration-thickness:2px;
+  font-weight:400!important;
+}
+.af-root .co-struck-now{ color:var(--brand,#9A6614)!important; font-weight:700!important; }
+
+/* Diagnostic Call row: override the old green so the struck pair shows through */
+.af-root .co-price-row.sale .val{ color:inherit!important; }
+
+/* ── Struck "before" price inside the gold pay button (white-text context) ─ */
+.af-root .co-pay-was{
+  text-decoration:line-through; text-decoration-thickness:2px;
+  opacity:.7; font-weight:400; margin-right:1px;
+}
+.af-root .co-pay-now{ font-weight:800; }
