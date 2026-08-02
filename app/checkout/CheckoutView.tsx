@@ -87,9 +87,10 @@ export function CheckoutView() {
   const [flagOpen, setFlagOpen] = useState(false);
   const [flagSearch, setFlagSearch] = useState("");
   const [couponOpen, setCouponOpen] = useState(false);
-  // Expanded by default. Desktop forces it open via CSS and hides the toggle,
-  // so this only affects mobile — where the user can still collapse it.
-  const [detailsOpen, setDetailsOpen] = useState(true);
+  // Collapsed by default so the form is reachable on mobile without scrolling
+  // past the summary. Desktop forces it open via CSS and hides the toggle, so
+  // this only affects mobile — where the user can still expand it.
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
   const [couponInput, setCouponInput] = useState("");
   const [couponMsg, setCouponMsg] = useState<{ text: string; tone: "error" | "success" } | null>(null);
