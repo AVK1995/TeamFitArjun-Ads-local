@@ -893,11 +893,10 @@ export function CheckoutView() {
                     <ul className="co-more-list">
                       <li>Personalised Diagnosis &amp; Transformation Roadmap</li>
                       <li>
-                        Honest fit check, we&rsquo;ll tell you if this programme isn&rsquo;t the right
-                        fit for your goals
+                        Walk-through of your Custom Execution Blueprint and 90-Day Transformation Plan
                       </li>
                       <li>
-                        Walk-through of your Custom Execution Blueprint and 90-Day Transformation Plan
+                        100% Results Guarantee: If you don’t see visible progress, we’ll continue coaching you until you do
                       </li>
                     </ul>
                   </div>
