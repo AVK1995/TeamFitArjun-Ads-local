@@ -1419,10 +1419,13 @@
 .af-root .af-stuck .af-cta .cta-top{ font-size:inherit!important; }
 @media (min-width:901px){
   .af-root .af-stuck .af-cta{
-    min-width:0!important; max-width:640px;
+    min-width:0!important; max-width:100%;
     font-size:clamp(12.5px,1vw,15px)!important;
     padding:12px 24px 11px!important;
   }
+  /* Desktop: the bar is wide enough for the full sentence, so pin the label to
+     one line and let the button grow to fit instead of wrapping to two. */
+  .af-root .af-stuck .af-cta .cta-lbl{ white-space:nowrap!important; }
 }
 @media (max-width:900px){
   .af-root .af-stuck .af-cta{ font-size:12.5px!important; padding:11px 16px 10px!important; }
@@ -1853,8 +1856,10 @@
 
 @media (min-width:901px){
   .af-root .af-stuck{ padding:12px 0 calc(11px + env(safe-area-inset-bottom))!important; }
+  /* max-width was 620px, which forced the label onto two lines. Shrink-to-fit
+     up to the inner container width so the sentence stays on one line. */
   .af-root .af-stuck .af-cta{
-    width:auto!important; min-width:420px; max-width:620px; flex:0 0 auto;
+    width:auto!important; min-width:420px; max-width:100%; flex:0 0 auto;
   }
   .af-root .af-stuck-trust li{ font-size:12px; }
 }

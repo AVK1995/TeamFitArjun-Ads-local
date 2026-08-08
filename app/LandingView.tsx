@@ -381,7 +381,7 @@ export function LandingView({ posterUrl = HERO_THUMB_URL }: { posterUrl?: string
         <div className="af-announce-track">
           <span><b>5+ Years</b> Of Coaching</span>
           <span className="dot" />
-          <span><b>1400+</b> Success Stories Globally</span>
+          <span><b>1500+</b> Success Stories Globally</span>
         </div>
       </div>
 
@@ -423,7 +423,7 @@ export function LandingView({ posterUrl = HERO_THUMB_URL }: { posterUrl?: string
           </p>
 
           <p className="af-sub af-sub-markers" data-af-reveal style={{ "--d": ".16s" } as React.CSSProperties}>
-            <b>1400+ Corporate Professionals</b> across{" "}
+            <b>1500+ Corporate Professionals</b> across{" "}
             <span className="af-hl">India, UK, Canada, Australia &amp; UAE</span> have{" "}
             <span className="af-hl-pill">lost 10+ kilos</span>, built visible muscle and improved key
             health markers linked to:
@@ -498,7 +498,7 @@ export function LandingView({ posterUrl = HERO_THUMB_URL }: { posterUrl?: string
         <div className="af-wrap">
           <div className="af-creds-grid" data-af-reveal>
             {[
-              { num: "1400+", label: "Success Stories", sub: "Globally" },
+              { num: "1500+", label: "Success Stories", sub: "Globally" },
               { num: "Featured On", label: "Aaj Tak · Zee News", sub: "HealthXP Featured", wide: true },
               { num: "5.0 ★", label: "Client Rating", sub: "Verified Reviews" },
               { num: `₹${price}`, label: "To Start", sub: "Fully Refundable" },
@@ -640,7 +640,7 @@ export function LandingView({ posterUrl = HERO_THUMB_URL }: { posterUrl?: string
               />
               <div className="count">
                 <div><b>104kg → 65kg</b><span>His Own Journey</span></div>
-                <div><b>1,400+</b><span>Clients</span></div>
+                <div><b>1,500+</b><span>Clients</span></div>
               </div>
             </div>
             <div className="af-about-text" data-af-reveal style={{ "--d": ".12s" } as React.CSSProperties}>
@@ -656,7 +656,7 @@ export function LandingView({ posterUrl = HERO_THUMB_URL }: { posterUrl?: string
               </p>
               <p>
                 Over the last <span className="af-hl">5 years</span> he&rsquo;s coached more than{" "}
-                <span className="af-hl-pill">1,400 clients</span> across{" "}
+                <span className="af-hl-pill">1,500 clients</span> across{" "}
                 <span className="af-hl">India, the US, UK, Canada, Australia and the UAE</span>, the bulk
                 of them men like you: corporate professionals with real careers, real families, and{" "}
                 <strong>no time for a plan that only works in theory</strong>.
@@ -832,7 +832,7 @@ export function LandingView({ posterUrl = HERO_THUMB_URL }: { posterUrl?: string
             </li>
             <li>
               <span className="af-trust-ic"><IconMedal /></span>
-              1400+ Success Stories Globally
+              1500+ Success Stories Globally
             </li>
           </ul>
         </div>
@@ -909,7 +909,7 @@ function CtaBlock({
         </li>
         <li>
           <span className="af-trust-ic"><IconMedal /></span>
-          1400+ Success Stories
+          1500+ Success Stories
         </li>
         <li>
           <span className="af-trust-ic"><IconGlobe /></span>
@@ -929,8 +929,8 @@ function CtaBlock({
 function CtaLabel() {
   return (
     <span className="cta-lbl">
-      Click Here To Get Your Personalised Diagnosis{" "}
-      <br className="cta-br" />&amp; Transformation Blueprint
+      Click Here To Get Your Personalized Diagnosis{" "}
+      <br className="cta-br" />&amp; Custom Execution Blueprint
     </span>
   );
 }

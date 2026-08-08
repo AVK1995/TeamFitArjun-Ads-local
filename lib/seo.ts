@@ -5,7 +5,7 @@
  * landing revamp: the old copy sold "Indian working men / roti + rice /
  * 40-50% belly fat / 1500+ clients", none of which the page claims any more.
  * Current positioning is corporate professionals 30+, lose 10-20 kilos and
- * build visible muscle via the Custom Execution Blueprint, 1400+ clients.
+ * build visible muscle via the Custom Execution Blueprint, 1500+ clients.
  *
  * Keep this in step with app/LandingView.tsx — a share preview that
  * contradicts the page costs trust at the worst possible moment.
@@ -33,7 +33,7 @@ export const seoMetadata: Record<string, PageSeo> = {
     // Share preview: mirrors the H1 verbatim so the card matches the page.
     ogTitle: "Lose 10-20 Kilos, Build Visible Muscle, & Never Start Over Again",
     ogDescription:
-      "A Custom Execution Blueprint for demanding careers, frequent travel and unpredictable schedules. 1400+ corporate professionals transformed. ₹97, fully refundable.",
+      "A Custom Execution Blueprint for demanding careers, frequent travel and unpredictable schedules. 1500+ corporate professionals transformed. ₹97, fully refundable.",
     ogImage: "/OG Images/Home OG.png",
     ogType: "website",
   },
